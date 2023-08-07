@@ -1,0 +1,118 @@
+﻿@page "/todos"
+@inject HttpClient client
+<link rel="stylesheet" href="~/css/tabler/tabler.min.css">
+<h1>Ваш список задач (@todosList.Count()):</h1>
+@if (todosList.Any())
+{
+    <div class="table-responsive">
+        <div class="table-responsive">
+            <table class="table table-vcenter">
+                <thead>
+                    <tr>
+                        <th>Задача</th>
+                        <th>Автор</th>
+                        <th>Описание</th>
+                        <th>Дата добавления</th>
+                        <th>Выполнена</th>
+                        <th class="w-1"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var todoItem in todosList)
+                    {
+                        <tr>
+                            <td>@todoItem.Title</td>
+                            <td class="text-muted">
+                                @todoItem.Author
+                            </td>
+                            <td class="text-muted"><a href="#" class="text-reset">@todoItem.Description</a></td>
+                            <td class="text-muted">
+                                @todoItem.DateAdded
+                            </td>
+                            <td class="text-green">
+                                 <input class="form-check-input align-middle" type="checkbox" @bind ="todoItem.IsDone"/>
+                            </td>
+
+                            <td>
+                                <button class="btn btn-danger m-1" @onclick="() => Delete(todoItem.Id)">Удалить</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+}
+else
+{
+    <h1>Почему-то тут пусто =(</h1>
+}
+
+<div class="modal" style="display: @(showModal ? "block" : "none")">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Добавить новую задачу</h5>
+                <button type="button" class="btn-close" @onclick="() => showModal = false"></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Задача</label>
+                    <input class="form-control" @bind="newTodo.Title" />
+                </div>
+                <div class="form-group">
+                    <label>Автор</label>
+                    <input class="form-control" @bind="newTodo.Author" />
+                </div>
+                <div class="form-group">
+                    <label>Описание</label>
+                    <textarea class="form-control" @bind="newTodo.Description"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" @onclick="AddTodo">Добавить</button>
+                <button type="button" class="btn btn-secondary" @onclick="() => showModal = false">Отмена</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex justify-content-end mb-2">
+    <button class="btn btn-success" @onclick="() => showModal = true">Добавить</button>
+</div>
+
+
+@code {
+    private List<TodoItems> todosList = new List<TodoItems>();
+    private TodoItems newTodo = new TodoItems(); 
+    private bool showModal = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        todosList.Clear();
+        Update();
+    }
+
+    private async void Delete(Guid Id)
+    {
+        await client.DeleteAsync("api/Todos/?id=" + Id);
+        Update();
+    }
+
+    private async Task Update()
+    {
+        todosList = await client.GetFromJsonAsync<List<TodoItems>>("api/Todos");
+        StateHasChanged();
+    }
+
+    private async Task AddTodo()
+    {
+        await client.PostAsJsonAsync("api/Todos", newTodo);
+
+        newTodo = new TodoItems();
+
+        showModal = false;
+        Update();
+    }
+}
