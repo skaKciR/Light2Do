@@ -12,6 +12,7 @@ namespace Light2Do.Shared
         public string Title { get; set; }
         public string Description { get; set; } 
         public DateTime DateAdded { get; set; } =DateTime.Now;
+        public DateTime DeadLine { get; set; } = DateTime.Now.AddDays(7);
         public bool IsDone { get; set; }
         public string Author { get; set; } = "КК";
     }

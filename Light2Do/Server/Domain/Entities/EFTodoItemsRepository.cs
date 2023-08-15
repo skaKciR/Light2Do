@@ -15,9 +15,11 @@ namespace Light2Do.Server.Domain.Entities
             {
                 context.TodoItems.AddRange(new List<TodoItems>()
             {
-                new TodoItems() {Title = "Добавить ToDo", Author = "КК", DateAdded = DateTime.Now, Description="ОписаниеТут", Id=new Guid(), IsDone = true},
-                new TodoItems() {Title = "Доделать ToDo", Author = "КК", DateAdded = DateTime.Now, Description="ДругоеОписаниеТут", Id=new Guid(), IsDone = false},
-                 new TodoItems() {Title = "ПеределатьДоделанное", Author = "КК", DateAdded = DateTime.Now, Description="Какое-тоОписание", Id=new Guid(), IsDone = false}
+                new TodoItems() {Title = "Создать компонент razor", Author = "Алексей", DateAdded = DateTime.Now, Description="Просто добавить компнонент в проект", Id=new Guid(), IsDone = true},
+                new TodoItems() {Title = "Написать код для компонента", Author = "Александр", DateAdded = DateTime.Now, Description="Добавить функционал", Id=new Guid(), IsDone = false},
+                 new TodoItems() {Title = "Добавить компонент на страницу", Author = "Кирилл", DateAdded = DateTime.Now, Description="Вызвать компонент передав параметры", Id=new Guid(), IsDone = false},
+                 new TodoItems() {Title = "Покормить кота", Author = "Кот", DateAdded = DateTime.Now, Description="Вкусно покормите кота", Id=new Guid(), IsDone = true},
+                 new TodoItems() {Title = "Поиграть с котом", Author = "Кот", DateAdded = DateTime.Now, Description="Отвлекитесь от VS, поиграйте с котом", Id=new Guid(), IsDone = false}
             });
                 context.SaveChanges();
             }

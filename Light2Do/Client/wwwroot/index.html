@@ -20,6 +20,19 @@
         <a class="dismiss">🗙</a>
     </div>
     <script src="_framework/blazor.webassembly.js"></script>
+    <script src="https://unpkg.com/imask"></script>
+
 </body>
 
 </html>
+<script>
+    function setMask(elementId, mask) {
+        const element = document.getElementById(elementId);
+        const maskOptions = {
+            mask: mask
+        };
+        const maskInstance = IMask(element, maskOptions);
+
+        return maskInstance;
+    }
+</script>

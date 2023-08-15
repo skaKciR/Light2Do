@@ -1,54 +1,67 @@
 ﻿@page "/todos"
 @inject HttpClient client
-<link rel="stylesheet" href="~/css/tabler/tabler.min.css">
+@inject IJSRuntime jsRuntime
+
+<div class="mb-1">
+    <label class="form-label">Поле для ввода номера телефона</label>
+    <input required type="text" id="maskedInput" class="form-control"/>
+</div>
+
 <h1>Ваш список задач (@todosList.Count()):</h1>
 @if (todosList.Any())
 {
     <div class="table-responsive">
         <div class="table-responsive">
-            <table class="table table-vcenter">
+            <table class="table table-vcenter border border-3 border-black">
                 <thead>
                     <tr>
-                        <th>Задача</th>
-                        <th>Автор</th>
-                        <th>Описание</th>
-                        <th>Дата добавления</th>
-                        <th>Выполнена</th>
-                        <th class="w-1"></th>
+                        <th class="text-center"><h4>Задача</h4></th>
+                        <th class="text-center"><h4>Автор</h4></th>
+                        <th class="text-center"><h4>Описание</h4></th>
+                        <th class="text-center"><h4>Дата добавления</h4></th>
+                        <th class="text-center"><h4>Дедлайн</h4></th>
+                        <th class="text-center"><h4>Выполнена</h4></th>
+                        <th class="text-center w-1"></th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var todoItem in todosList)
                     {
-                        <tr>
-                            <td>@todoItem.Title</td>
-                            <td class="text-muted">
-                                @todoItem.Author
-                            </td>
-                            <td class="text-muted"><a href="#" class="text-reset">@todoItem.Description</a></td>
-                            <td class="text-muted">
-                                @todoItem.DateAdded
-                            </td>
-                            <td class="text-green">
-                                 <input class="form-check-input align-middle" type="checkbox" @bind ="todoItem.IsDone"/>
-                            </td>
 
-                            <td>
+                        <tr style=" @(todoItem.IsDone ? "background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%); color:white" :"")">
+                            <td class="text-center"><h5>@todoItem.Title</h5></td>
+                            <td class="text-center">
+                                <h5>@todoItem.Author</h5>
+                            </td>
+                            <td class="text-center">
+                                <a href="#" class="text-reset" style="display: inline-block; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                    <h5>@todoItem.Description</h5>
+                                </a>
+                            </td>
+                            <td class="text-center">
+                                <h5>@todoItem.DateAdded.ToString("dd/MM/yyyy")</h5>
+                            </td>
+                            <td class="text-center">
+                                <h5>@todoItem.DeadLine.ToString("dd/MM/yyyy")</h5>
+                            </td>
+                            <td class="text-center">
+                                <input class="form-check-input align-middle" style="width:1.5em !important;height:1.5em !important" type="checkbox" @bind="todoItem.IsDone" />
+                            </td>
+                            <td class="text-center">
                                 <button class="btn btn-danger m-1" @onclick="() => Delete(todoItem.Id)">Удалить</button>
                             </td>
                         </tr>
+
                     }
                 </tbody>
             </table>
         </div>
-
     </div>
 }
 else
 {
     <h1>Почему-то тут пусто =(</h1>
 }
-
 <div class="modal" style="display: @(showModal ? "block" : "none")">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -81,12 +94,22 @@ else
 <div class="d-flex justify-content-end mb-2">
     <button class="btn btn-success" @onclick="() => showModal = true">Добавить</button>
 </div>
+<TodosSlider Tasks="todosList.Where(x => !x.IsDone).ToList()" />
 
+<div class="container">
+    <div class="row justify-content-md-center">
+        <div class="col-md-auto">
+            <label>Введите номер телефона</label>
+            <input type="text" />
+        </div>
+    </div>
+</div>
 
 @code {
     private List<TodoItems> todosList = new List<TodoItems>();
-    private TodoItems newTodo = new TodoItems(); 
+    private TodoItems newTodo = new TodoItems();
     private bool showModal = false;
+    private ElementReference phoneNumberInput;
 
     protected override async Task OnInitializedAsync()
     {
@@ -114,5 +137,13 @@ else
 
         showModal = false;
         Update();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await jsRuntime.InvokeVoidAsync("setMask", "maskedInput", "+{7}(000)000-00-00");
+        }
     }
 }
